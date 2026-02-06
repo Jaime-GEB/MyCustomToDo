@@ -25,6 +25,7 @@ export interface ToDoItem {
   itemPriorityLevel: PriorityLevel;
   itemParent: ItemParent
   listId: ToDoListId;
+  alarmTime:string | null
 }
 
 // ---------- Estado del store ----------
@@ -79,13 +80,7 @@ export interface ToDoState {
   // mover entre listas (cambia pertenencia + orden)
   moveItem: (itemId: ToDoItemId, toListId: ToDoListId, toIndex?: number) => void;
 
-  clearCompletedInList: (listId: ToDoListId) => void;
-
-  // ---------- Control de Indentación (vía PriorityLevel) ----------
-  indentItem: (itemId: ToDoItemId, delta: 1 | -1) => void;
-
-  // ---------- Control de Filtros ----------
-  setItemFilter: (listId: ToDoListId, filter: Filter) => void;
+  setAlarm:(itemId: ToDoItemId, alarmTime: string) => void;
 
   // ---------- Hidrataciones ----------
   hydrate: (payload: {

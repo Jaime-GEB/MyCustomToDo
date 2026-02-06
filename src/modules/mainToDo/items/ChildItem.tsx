@@ -9,6 +9,8 @@ import {
 import { DeleteOutline, ExpandMore, ExpandLess, LibraryAdd } from '@mui/icons-material';
 import type { ToDoItem } from "../../../types/StoreTypes";
 import CreateChildForm from "../forms/CreateChildForm";
+import { useState } from "react";
+import EditItem from "../components/EditChildren";
 
 interface ChildItemProps {
     parentItem: ToDoItem;
@@ -41,6 +43,9 @@ const ChildItem = ({
     showChildForm,
     onCloseChildForm
 }: ChildItemProps) => {
+
+    const [changeName, setChangeName]=useState(false)
+
     // Indentación en píxeles: 40px por nivel de prioridad para una jerarquía visual clara
     const indentPx = 40 * childItem.itemPriorityLevel;
     const index = parentIndex + 1;
@@ -113,7 +118,12 @@ const ChildItem = ({
                         />
                     </ListItemIcon>
                     <ListItemText
-                        primary={childItem.itemName}
+                        primary={changeName?
+                            <EditItem itemId={childItem.itemId} value={listId} setChangeName={setChangeName}/>
+                            :
+                            childItem.itemName
+                        }
+                        onDoubleClick={((e)=>{ setChangeName(true);e.stopPropagation(); })}
                         sx={{
                             fontSize: '1rem',
                             fontWeight: 500,

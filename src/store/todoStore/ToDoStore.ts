@@ -3,7 +3,6 @@ import { devtools, persist } from 'zustand/middleware';
 import {
     type ToDoListId,
     type ToDoItemId,
-    type PriorityLevel,
     type ToDoList,
     type ToDoItem,
     type ToDoState,
@@ -154,7 +153,8 @@ const useToDoStore = create<ToDoState>()(
                             itemDescription,
                             itemPriorityLevel: priority,
                             itemParent,
-                            itemCompleted: false
+                            itemCompleted: false,
+                            alarmTime:null,
                         };
 
                         return {
@@ -283,53 +283,43 @@ const useToDoStore = create<ToDoState>()(
                         };
                     }, false, 'items/moveItem'),
 
-                /** Elimina todos los ítems completados de una lista. */
-                clearCompletedInList: (listId) =>
-                    set((state) => {
-                        const itemIds = state.itemsOrderByList[listId] || [];
-                        const completedIds = itemIds.filter(id => state.items[id]?.itemCompleted);
+                // /** Elimina todos los ítems completados de una lista. */
+                // clearCompletedInList: (listId) =>
+                //     set((state) => {
+                //         const itemIds = state.itemsOrderByList[listId] || [];
+                //         const completedIds = itemIds.filter(id => state.items[id]?.itemCompleted);
 
-                        if (completedIds.length === 0) return state;
+                //         if (completedIds.length === 0) return state;
 
-                        const newItems = { ...state.items };
-                        completedIds.forEach(id => delete newItems[id]);
+                //         const newItems = { ...state.items };
+                //         completedIds.forEach(id => delete newItems[id]);
 
-                        const newOrder = itemIds.filter(id => !completedIds.includes(id));
+                //         const newOrder = itemIds.filter(id => !completedIds.includes(id));
 
-                        return {
-                            items: newItems,
-                            itemsOrderByList: {
-                                ...state.itemsOrderByList,
-                                [listId]: newOrder
-                            }
-                        };
-                    }, false, 'items/clearCompletedInList'),
+                //         return {
+                //             items: newItems,
+                //             itemsOrderByList: {
+                //                 ...state.itemsOrderByList,
+                //                 [listId]: newOrder
+                //             }
+                //         };
+                //     }, false, 'items/clearCompletedInList'),
 
-                /** Cambia la indentación de un ítem (incrementa o decrementa el nivel de prioridad entre 1 y 5). */
-                indentItem: (itemId, delta) =>
-                    set((state) => {
+                /** Establece una alarma para ese item */
+                setAlarm: (itemId, alarmTime)=>
+                    set((state)=>{
                         const item = state.items[itemId];
                         if (!item) return state;
-
-                        const newLevel = Math.max(1, Math.min(5, item.itemPriorityLevel + delta)) as PriorityLevel;
-                        if (newLevel === item.itemPriorityLevel) return state;
 
                         return {
                             items: {
                                 ...state.items,
-                                [itemId]: { ...item, itemPriorityLevel: newLevel }
+                                [itemId]: { ...item, alarmTime:alarmTime }
                             }
                         };
-                    }, false, 'items/indentItem'),
 
-                /** Establece el filtro para una lista específica. */
-                setItemFilter: (listId, filter) =>
-                    set((state) => ({
-                        itemsFilterByList: {
-                            ...(state.itemsFilterByList),
-                            [listId]: filter
-                        }
-                    }), false, 'filters/setItemFilter'),
+                    }),
+
 
                 /* --- HIDRATACIÓN --- */
 
