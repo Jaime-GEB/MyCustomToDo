@@ -1,16 +1,19 @@
 import {
     List,
     Typography,
-    Box
+    Box,
+    Drawer
 } from "@mui/material";
 import { useState } from "react";
 import useToDoStore from "../../store/todoStore/ToDoStore";
 import { useShallow } from "zustand/shallow";
 import type { ItemParent } from "../../types/StoreTypes";
-import CompletedList from './CompletedList';
-import MainItem from "./MainItem";
-import CreateItemForm from "./CreateItemForm";
-import ChildItem from "./ChildItem";
+import CompletedList from './items/CompletedList';
+import MainItem from "./items/MainItem";
+import CreateItemForm from "./forms/CreateItemForm";
+import ChildItem from "./items/ChildItem";
+import SideInfo from "../sideInfo/SideInfo";
+import { MainBody } from "./components/customComponents";
 
 /**
  * Componente principal que renderiza la lista de tareas.
@@ -26,8 +29,16 @@ const MainToDo = ({ value }: { value: string }) => {
 
     const [createChild, setCreateChild] = useState<ItemParent>('');
     const [childBtnClicked, setChildBtnClicked] = useState(false);
+    const [openDrawer, setOpenDrawer] = useState('');
 
     if (!list) return null;
+
+    const handleOpenDrawer = (item: string) => {
+        setOpenDrawer(item)
+    }
+    const handleCloseDrawer = () => {
+        setOpenDrawer('')
+    }
 
     /**
      * Alterna la visibilidad del formulario para crear una subtarea.
@@ -48,54 +59,69 @@ const MainToDo = ({ value }: { value: string }) => {
     };
 
     return (
-        <Box sx={{ pb: 8, mx: 'auto' }}>
-            <Box sx={{ mb: 6 }}>
-                <Typography variant="h4" sx={{ mb: 1, letterSpacing: '-0.02em', color: 'text.primary' }}>
-                    {list.listName}
-                </Typography>
-                {list.listDescription && (
-                    <Typography variant="body1" sx={{ color: 'text.secondary', opacity: 0.8 }}>
-                        {list.listDescription}
+
+        <Box>
+            <MainBody sx={{ pb: 8 }} open={openDrawer !== ''} onClick={handleCloseDrawer}>
+                <Box sx={{ mb: 6 }}>
+                    <Typography variant="h4" sx={{ mb: 1, letterSpacing: '-0.02em', color: 'text.primary' }}>
+                        {list.listName}
                     </Typography>
-                )}
-            </Box>
+                    {list.listDescription && (
+                        <Typography variant="body1" sx={{ color: 'text.secondary', opacity: 0.8 }}>
+                            {list.listDescription}
+                        </Typography>
+                    )}
+                </Box>
 
-            <CreateItemForm listId={value} />
+                <CreateItemForm listId={value} />
 
-            <List sx={{ p: 0, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                {items.map((item, index) => (
-                    item.itemCompleted === false ? (
-                        <Box key={item.itemId}>
-                            <MainItem
-                                item={item}
-                                index={index}
-                                listId={value}
-                                onToggle={toggleItem}
-                                onRemove={removeItem}
-                                onReOrder={handleReOrder}
-                                onAddChildBtn={handleChildBtn}
-                                showChildForm={createChild === item.itemId}
-                                onCloseChildForm={() => setCreateChild('')}
-                            />
-                            <ChildItem
-                                parentItem={item.itemParent ? allItems[item.itemParent] || item : item}
-                                childItem={item}
-                                parentIndex={item.itemParent ? items.findIndex(i => i.itemId === item.itemParent) : -1}
-                                parentIsCompleted={item.itemParent ? allItems[item.itemParent]?.itemCompleted ?? false : false}
-                                listId={value}
-                                onToggle={toggleItem}
-                                onRemove={removeItem}
-                                onReOrder={handleReOrder}
-                                onAddChildBtn={handleChildBtn}
-                                showChildForm={createChild === item.itemId}
-                                onCloseChildForm={() => setCreateChild('')}
-                            />
-                        </Box>
-                    ) : null
-                ))}
-            </List>
-            <CompletedList value={value} />
-        </Box>
+                <List sx={{ p: 0, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    {items.map((item, index) => (
+                        item.itemCompleted === false ? (
+                            <Box key={item.itemId}>
+                                <MainItem
+                                    item={item}
+                                    index={index}
+                                    listId={value}
+                                    onToggle={toggleItem}
+                                    onRemove={removeItem}
+                                    onReOrder={handleReOrder}
+                                    onAddChildBtn={handleChildBtn}
+                                    onOpenDrawer={handleOpenDrawer}
+                                    showChildForm={createChild === item.itemId}
+                                    onCloseChildForm={() => setCreateChild('')}
+                                />
+                                <ChildItem
+                                    parentItem={item.itemParent ? allItems[item.itemParent] || item : item}
+                                    childItem={item}
+                                    parentIndex={item.itemParent ? items.findIndex(i => i.itemId === item.itemParent) : -1}
+                                    parentIsCompleted={item.itemParent ? allItems[item.itemParent]?.itemCompleted ?? false : false}
+                                    listId={value}
+                                    onToggle={toggleItem}
+                                    onRemove={removeItem}
+                                    onReOrder={handleReOrder}
+                                    onAddChildBtn={handleChildBtn}
+                                    showChildForm={createChild === item.itemId}
+                                    onCloseChildForm={() => setCreateChild('')}
+                                />
+                            </Box>
+                        ) : null
+                    ))}
+                </List>
+                <CompletedList value={value} />
+            </MainBody>
+
+            {
+                openDrawer === '' ?
+                    null
+                    :
+                    <Drawer variant="persistent" open={openDrawer !== ''} onClose={handleCloseDrawer} anchor="right">
+                        <SideInfo itemId={openDrawer} value={value}/>
+                    </Drawer>
+
+            }
+        </Box >
+
     );
 };
 

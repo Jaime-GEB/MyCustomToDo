@@ -7,8 +7,8 @@ import {
     ListItemButton,
 } from "@mui/material";
 import { DeleteOutline, ExpandMore, ExpandLess, LibraryAdd } from '@mui/icons-material';
-import type { ToDoItem } from "../../types/StoreTypes";
-import CreateChildForm from "./CreateChildForm";
+import type { ToDoItem } from "../../../types/StoreTypes";
+import CreateChildForm from "../forms/CreateChildForm";
 
 interface MainItemProps {
     item: ToDoItem;
@@ -18,6 +18,7 @@ interface MainItemProps {
     onRemove: (id: string) => void;
     onReOrder: (index: number, direction: 'up' | 'down') => void;
     onAddChildBtn: (id: string) => void;
+    onOpenDrawer: (item:string) => void;
     showChildForm: boolean;
     onCloseChildForm: () => void;
 }
@@ -34,6 +35,7 @@ const MainItem = ({
     onRemove,
     onReOrder,
     onAddChildBtn,
+    onOpenDrawer,
     showChildForm,
     onCloseChildForm
 }: MainItemProps) => {
@@ -102,6 +104,7 @@ const MainItem = ({
                     </ListItemIcon>
                     <ListItemText
                         primary={item.itemName}
+                        onClick={((e)=>{ onOpenDrawer(item.itemId);e.stopPropagation(); })}
                         sx={{
                             fontSize: '1rem',
                             fontWeight: 500,
