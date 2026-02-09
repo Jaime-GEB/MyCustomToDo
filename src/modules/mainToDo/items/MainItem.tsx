@@ -10,6 +10,7 @@ import { DeleteOutline, ExpandMore, ExpandLess, LibraryAdd } from '@mui/icons-ma
 import type { ToDoItem } from "../../../types/StoreTypes";
 import CreateChildForm from "../forms/CreateChildForm";
 import ChildItem from "./ChildItem";
+import useTimer from "../../../hooks/useTimer";
 
 interface MainItemProps {
     item: ToDoItem;
@@ -46,6 +47,7 @@ const MainItem = ({
     deployChildren,
     allItems
 }: MainItemProps) => {
+    const {isRunning, segundos, minutos, horas} = useTimer()
 
     if (item.itemParent === undefined || item.itemParent === null) return (
         <>
@@ -116,7 +118,11 @@ const MainItem = ({
                         />
                     </ListItemIcon>
                     <ListItemText
-                        primary={item.itemName}
+                        primary={
+                        <div className="flex flex-row gap-10">
+                            <p>{item.itemName}</p>
+                        </div>
+                        }
                         onDoubleClick={((e) => { onOpenDrawer(item.itemId); e.stopPropagation(); })}
                         sx={{
                             fontSize: '1rem',

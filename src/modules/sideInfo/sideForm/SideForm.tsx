@@ -41,9 +41,15 @@ const SideForm = ({itemId, value}:{itemId:string, value:string}) => {
             <TextField
                 label="Nombre"
                 sx={{
-                    fontSize: '1.3rem',
-                    fontWeight:'bold',
-                    '& input::placeholder': { opacity: 0.6 }
+                    '& .MuiInputBase-input': {
+                      fontSize: '2rem',
+                      alignSelf:'center',
+                      justifySelf:'center'
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontSize: '1rem',
+                      alignSelf:'center'
+                    },
                 }}
                 value={thisItem?.itemName}
                 multiline
