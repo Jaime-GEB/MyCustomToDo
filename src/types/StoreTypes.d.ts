@@ -25,13 +25,14 @@ export interface ToDoItem {
   itemPriorityLevel: PriorityLevel;
   itemParent: ItemParent
   listId: ToDoListId;
-  alarmTime:string | null
+  alarmTime: string | null
 }
 
 // ---------- Estado del store ----------
 
 export interface ToDoState {
   // Entidades
+  currentListId: ToDoListId | 'new';
   lists: Record<ToDoListId, ToDoList>;
   items: Record<ToDoItemId, ToDoItem>;
 
@@ -53,6 +54,7 @@ export interface ToDoState {
   };
 
   // ---------- Acciones sobre listas ----------
+  setCurrentList: (listId: ToDoListId) => void;
   addList: (listName: string, listDescription: string) => void;
   editList: (listId: ToDoListId, fields: Partial<Pick<ToDoList, "listName" | "listDescription">>) => void;
   removeList: (listId: ToDoListId, options?: { cascadeItems?: boolean }) => void; // decide si borras sus items
@@ -80,7 +82,7 @@ export interface ToDoState {
   // mover entre listas (cambia pertenencia + orden)
   moveItem: (itemId: ToDoItemId, toListId: ToDoListId, toIndex?: number) => void;
 
-  setAlarm:(itemId: ToDoItemId, alarmTime: string) => void;
+  setAlarm: (itemId: ToDoItemId, alarmTime: string) => void;
 
   // ---------- Hidrataciones ----------
   hydrate: (payload: {

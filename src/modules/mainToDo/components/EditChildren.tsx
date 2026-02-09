@@ -24,7 +24,7 @@ const EditItem = ({ itemId, value, setChangeName }: { itemId: string, value: str
     }, [editItem, itemId, newItem])
 
     const handleCloseEditChild = (e: KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' || e.key === 'Escape') {
             setChangeName(false)
         }
     }
@@ -35,20 +35,17 @@ const EditItem = ({ itemId, value, setChangeName }: { itemId: string, value: str
             elevation={0}
             sx={{
                 display: "flex",
-                width: 'auto',
+                width: '50vw',
             }}
         >
             <TextField
-                sx={{
-                    size: 'auto',
-                    fontSize: '1rem',
-                    width: '80vw',
-                    '& input::placeholder': { opacity: 0.6 }
-                }}
+                sx={{ width: '50vw' }}
                 value={thisItem?.itemName}
                 multiline
                 onChange={(e) => setNewItem({ itemName: e.target.value })}
                 onKeyDown={handleCloseEditChild}
+                autoFocus
+                onFocus={(event) => event.target.select()}
             />
         </Paper>
     );

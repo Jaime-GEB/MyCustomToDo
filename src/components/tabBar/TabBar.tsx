@@ -7,6 +7,7 @@ import { type Dispatch, type SetStateAction } from "react";
 const TabBar = ({ value, setValue }: { value: string, setValue: Dispatch<SetStateAction<string>> }) => {
     const allLists = useToDoStore(useShallow((store) => store.getAllLists()));
     const removeList = useToDoStore((store) => store.removeList);
+    const setCurrentList = useToDoStore((store)=>store.setCurrentList)
 
     return (
         <section className="flex border-x-2 border-slate-200 dark:border-slate-800 w-[92%] h-10 items-center px-4">
@@ -26,6 +27,7 @@ const TabBar = ({ value, setValue }: { value: string, setValue: Dispatch<SetStat
                         <Tab
                             value={list.listId}
                             label={list.listName}
+                            onClick={() => setCurrentList(list.listId)}
                             icon={
                                 <Close
                                     sx={{

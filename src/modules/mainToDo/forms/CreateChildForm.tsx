@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 import { Paper, InputBase, IconButton } from "@mui/material";
 import { Add } from '@mui/icons-material';
 import useToDoStore from "../../../store/todoStore/ToDoStore";
@@ -42,9 +42,15 @@ const CreateChildForm = ({ listId, parentId, parentPriority, onClose }: CreateCh
         }
     };
 
+    const handleCloseEditChild = (e: KeyboardEvent<HTMLDivElement>) => {
+            if (e.key === 'Escape') {
+                onClose()
+            }
+        }
+
     // Coincide con la lógica de indentación de ChildItem: 40px * prioridad
     // Se usa la prioridad del padre porque el nuevo item será su hijo inmediato visualmente en este contexto
-    const indentPx = 40 * parentPriority;
+    const indentPx = 50 * parentPriority;
 
     return (
         <Paper
@@ -78,8 +84,10 @@ const CreateChildForm = ({ listId, parentId, parentPriority, onClose }: CreateCh
                     '& input::placeholder': { opacity: 0.6 }
                 }}
                 placeholder="Añadir nueva subtarea..."
+                autoFocus
                 value={newItemChildName}
                 onChange={(e) => setNewItemChildName(e.target.value)}
+                onKeyDown={handleCloseEditChild}
             />
             <IconButton
                 type="submit"

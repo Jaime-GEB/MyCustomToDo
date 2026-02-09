@@ -21,6 +21,7 @@ const useToDoStore = create<ToDoState>()(
                 /* --- ENTIDADES (Estado inicial) --- */
                 lists: {},
                 items: {},
+                currentListId: 'new',
 
                 /* --- ORDEN --- */
                 listsOrder: [],
@@ -67,6 +68,10 @@ const useToDoStore = create<ToDoState>()(
 
                 /* --- ACCIONES SOBRE LISTAS --- */
 
+                /** Añade la lista activa. */
+                setCurrentList: (currentListId) =>
+                    set({ currentListId }),
+
                 /** Añade una nueva lista. */
                 addList: (listName, listDescription) =>
                     set((state) => {
@@ -82,7 +87,8 @@ const useToDoStore = create<ToDoState>()(
                         return {
                             lists: { ...state.lists, [listId]: newList },
                             listsOrder: [...state.listsOrder, listId],
-                            itemsOrderByList: { ...state.itemsOrderByList, [listId]: [] }
+                            itemsOrderByList: { ...state.itemsOrderByList, [listId]: [] },
+                            currentListId: listId
                         };
                     }, false, 'lists/addList'),
 
@@ -154,7 +160,7 @@ const useToDoStore = create<ToDoState>()(
                             itemPriorityLevel: priority,
                             itemParent,
                             itemCompleted: false,
-                            alarmTime:null,
+                            alarmTime: null,
                         };
 
                         return {
@@ -306,15 +312,15 @@ const useToDoStore = create<ToDoState>()(
                 //     }, false, 'items/clearCompletedInList'),
 
                 /** Establece una alarma para ese item */
-                setAlarm: (itemId, alarmTime)=>
-                    set((state)=>{
+                setAlarm: (itemId, alarmTime) =>
+                    set((state) => {
                         const item = state.items[itemId];
                         if (!item) return state;
 
                         return {
                             items: {
                                 ...state.items,
-                                [itemId]: { ...item, alarmTime:alarmTime }
+                                [itemId]: { ...item, alarmTime: alarmTime }
                             }
                         };
 
@@ -353,7 +359,8 @@ const useToDoStore = create<ToDoState>()(
                     items: state.items,
                     listsOrder: state.listsOrder,
                     itemsOrderByList: state.itemsOrderByList,
-                    itemsFilterByList: state.itemsFilterByList
+                    itemsFilterByList: state.itemsFilterByList,
+                    currentListId: state.currentListId
                 }),
             }
         ),

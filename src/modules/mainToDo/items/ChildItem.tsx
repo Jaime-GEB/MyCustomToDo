@@ -22,8 +22,13 @@ interface ChildItemProps {
     onRemove: (id: string) => void;
     onReOrder: (index: number, direction: 'up' | 'down') => void;
     onAddChildBtn: (id: string) => void;
+    //onOpenDrawer: (id: string) => void;
+    createChild: string | null;
     showChildForm: boolean;
     onCloseChildForm: () => void;
+    onDeployChildren: (id: string) => void;
+    deployChildren: Set<string>;
+    allItems: ToDoItem[];
 }
 
 /**
@@ -41,19 +46,35 @@ const ChildItem = ({
     onReOrder,
     onAddChildBtn,
     showChildForm,
-    onCloseChildForm
+    onCloseChildForm,
+    onDeployChildren,
+    deployChildren,
+    //onOpenDrawer,
+    createChild,
+    allItems,
 }: ChildItemProps) => {
 
-    const [changeName, setChangeName]=useState(false)
+    const [changeName, setChangeName] = useState(false)
 
     // Indentación en píxeles: 40px por nivel de prioridad para una jerarquía visual clara
     const indentPx = 40 * childItem.itemPriorityLevel;
-    const index = parentIndex + 1;
+
+    const index = parentIndex;
 
     // Determina el estado efectivo de completado (si el padre está completo, el hijo también lo está visualmente)
     const isCompleted = childItem.itemCompleted || parentIsCompleted;
 
-    if (childItem.itemParent === parentItem.itemId) return (
+    // Si el padre no está expandido, no renderizamos nada (no ocupa lugar en el DOM)
+    if (!deployChildren.has(parentItem.itemId)) {
+        return null;
+    }
+
+    // Solo renderizamos si este item es efectivamente hijo del padre proporcionado
+    if (childItem.itemParent !== parentItem.itemId) {
+        return null;
+    }
+
+    return (
         <>
             <ListItem
                 disablePadding
@@ -75,10 +96,19 @@ const ChildItem = ({
                 secondaryAction={
                     <div className="flex flex-row">
                         <IconButton
+                            sx={{ mr: 10 - (childItem.itemPriorityLevel * 2), '&:hover': { color: 'text.disabled' } }}
+                            onClick={((e) => { onDeployChildren(childItem.itemId); e.stopPropagation(); })}
+                        >
+                            {deployChildren.has(childItem.itemId) ? <ExpandLess /> : <ExpandMore />}
+                        </IconButton>
+                        <IconButton
                             edge="end"
                             aria-label="add-child"
-                            onClick={() => onAddChildBtn(childItem.itemId)}
-                            sx={{ mr: 1, color: 'text.disabled', '&:hover': { color: 'error.main' } }}
+                            onClick={() => {
+                                onAddChildBtn(childItem.itemId);
+                                if (!deployChildren.has(childItem.itemId)) onDeployChildren(childItem.itemId);
+                            }}
+                            sx={{ mr: 1, color: 'text.disabled', '&:hover': { color: 'info.main' } }}
                         >
                             <LibraryAdd />
                         </IconButton>
@@ -118,12 +148,12 @@ const ChildItem = ({
                         />
                     </ListItemIcon>
                     <ListItemText
-                        primary={changeName?
-                            <EditItem itemId={childItem.itemId} value={listId} setChangeName={setChangeName}/>
+                        primary={changeName ?
+                            <EditItem itemId={childItem.itemId} value={listId} setChangeName={setChangeName} />
                             :
                             childItem.itemName
                         }
-                        onDoubleClick={((e)=>{ setChangeName(true);e.stopPropagation(); })}
+                        onDoubleClick={((e) => { setChangeName(true); e.stopPropagation(); })}
                         sx={{
                             fontSize: '1rem',
                             fontWeight: 500,
@@ -131,7 +161,8 @@ const ChildItem = ({
                             color: isCompleted ? 'text.disabled' : 'text.primary',
                             transition: 'all 0.2s',
                             wordBreak: 'break-word',
-                            display: 'block'
+                            display: 'block',
+                            width: '50vw'
                         }}
                     />
                 </ListItemButton>
@@ -144,6 +175,36 @@ const ChildItem = ({
                     parentPriority={childItem.itemPriorityLevel}
                     onClose={onCloseChildForm}
                 />
+            )}
+
+            {/* Renderizado de hijos */}
+            {deployChildren.has(childItem.itemId) && (
+                <div className="flex flex-col gap-1.5 mt-1.5">
+                    {allItems.filter(cf => cf.itemParent === childItem.itemId).map((cf) => {
+                        const absoluteIndex = allItems.findIndex(i => i.itemId === cf.itemId);
+                        return (
+                            <ChildItem
+                                key={cf.itemId}
+                                parentItem={childItem}
+                                childItem={cf}
+                                parentIndex={absoluteIndex}
+                                parentIsCompleted={isCompleted}
+                                listId={listId}
+                                onToggle={onToggle}
+                                onRemove={onRemove}
+                                onReOrder={onReOrder}
+                                onAddChildBtn={onAddChildBtn}
+                                //onOpenDrawer={onOpenDrawer}
+                                createChild={createChild}
+                                showChildForm={createChild === cf.itemId}
+                                onCloseChildForm={onCloseChildForm}
+                                onDeployChildren={onDeployChildren}
+                                deployChildren={deployChildren}
+                                allItems={allItems}
+                            />
+                        )
+                    })}
+                </div>
             )}
         </>
     );

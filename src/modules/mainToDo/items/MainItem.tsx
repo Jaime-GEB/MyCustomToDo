@@ -9,6 +9,7 @@ import {
 import { DeleteOutline, ExpandMore, ExpandLess, LibraryAdd } from '@mui/icons-material';
 import type { ToDoItem } from "../../../types/StoreTypes";
 import CreateChildForm from "../forms/CreateChildForm";
+import ChildItem from "./ChildItem";
 
 interface MainItemProps {
     item: ToDoItem;
@@ -18,9 +19,12 @@ interface MainItemProps {
     onRemove: (id: string) => void;
     onReOrder: (index: number, direction: 'up' | 'down') => void;
     onAddChildBtn: (id: string) => void;
-    onOpenDrawer: (item:string) => void;
-    showChildForm: boolean;
+    onOpenDrawer: (item: string) => void;
+    createChild: string | null;
     onCloseChildForm: () => void;
+    onDeployChildren: (id: string) => void;
+    deployChildren: Set<string>;
+    allItems: ToDoItem[];
 }
 
 /**
@@ -36,8 +40,11 @@ const MainItem = ({
     onReOrder,
     onAddChildBtn,
     onOpenDrawer,
-    showChildForm,
-    onCloseChildForm
+    createChild,
+    onCloseChildForm,
+    onDeployChildren,
+    deployChildren,
+    allItems
 }: MainItemProps) => {
 
     if (item.itemParent === undefined || item.itemParent === null) return (
@@ -60,10 +67,16 @@ const MainItem = ({
                 secondaryAction={
                     <div className="flex flex-row">
                         <IconButton
+                            sx={{ mr: 10, '&:hover': { color: 'text.disabled' } }}
+                            onClick={((e) => { onDeployChildren(item.itemId); e.stopPropagation(); })}
+                        >
+                            {deployChildren.has(item.itemId) ? <ExpandLess /> : <ExpandMore />}
+                        </IconButton>
+                        <IconButton
                             edge="end"
                             aria-label="add-child"
-                            onClick={() => onAddChildBtn(item.itemId)}
-                            sx={{ mr: 1, color: 'text.disabled', '&:hover': { color: 'error.main' } }}
+                            onClick={() => { onAddChildBtn(item.itemId); onDeployChildren(item.itemId) }}
+                            sx={{ mr: 1, color: 'text.disabled', '&:hover': { color: 'info.main' } }}
                         >
                             <LibraryAdd />
                         </IconButton>
@@ -104,7 +117,7 @@ const MainItem = ({
                     </ListItemIcon>
                     <ListItemText
                         primary={item.itemName}
-                        onClick={((e)=>{ onOpenDrawer(item.itemId);e.stopPropagation(); })}
+                        onDoubleClick={((e) => { onOpenDrawer(item.itemId); e.stopPropagation(); })}
                         sx={{
                             fontSize: '1rem',
                             fontWeight: 500,
@@ -118,13 +131,43 @@ const MainItem = ({
                 </ListItemButton>
             </ListItem>
 
-            {showChildForm && (
+            {createChild === item.itemId && (
                 <CreateChildForm
                     listId={listId}
                     parentId={item.itemId}
                     parentPriority={item.itemPriorityLevel}
                     onClose={onCloseChildForm}
                 />
+            )}
+
+            {/* Renderizado de hijos */}
+            {deployChildren.has(item.itemId) && (
+                <div className="flex flex-col gap-1.5 mt-1.5">
+                    {allItems.filter(child => child.itemParent === item.itemId).map((child) => {
+                        const absoluteIndex = allItems.findIndex(i => i.itemId === child.itemId);
+                        return (
+                            <ChildItem
+                                key={child.itemId}
+                                parentItem={item}
+                                childItem={child}
+                                parentIndex={absoluteIndex}
+                                parentIsCompleted={item.itemCompleted}
+                                listId={listId}
+                                onToggle={onToggle}
+                                onRemove={onRemove}
+                                onReOrder={onReOrder}
+                                onAddChildBtn={onAddChildBtn}
+                                //onOpenDrawer={onOpenDrawer}
+                                createChild={createChild}
+                                showChildForm={createChild === child.itemId}
+                                onCloseChildForm={onCloseChildForm}
+                                onDeployChildren={onDeployChildren}
+                                deployChildren={deployChildren}
+                                allItems={allItems}
+                            />
+                        )
+                    })}
+                </div>
             )}
 
 
