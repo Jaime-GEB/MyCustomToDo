@@ -17,13 +17,52 @@ const timeToAlarm = (hours: number, mins: number) => {
 }
 
 const ClockAlarm = ({ itemId, value }: { itemId: string, value: string }) => {
-    const [isSet, setIsSet] = useState(false);
-    const [timeLeft, setTimeLeft] = useState<number | null>(null)
-    const [hours, setHours] = useState(new Date().getHours());
-    const [mins, setMins] = useState(new Date().getMinutes());
     const setAlarm = useToDoStore((state) => state.setAlarm);
     const items = useToDoStore(useShallow((state) => state.getVisibleItemsInList(value)));
     const thisItem = items.find((item) => item.itemId === itemId);
+
+    const [isSet, setIsSet] = useState(() => !!thisItem?.alarmTime);
+    const [hours, setHours] = useState(() => {
+        if (thisItem?.alarmTime) {
+            return Number(thisItem.alarmTime.split(':')[0]);
+        }
+        return new Date().getHours();
+    });
+    const [mins, setMins] = useState(() => {
+        if (thisItem?.alarmTime) {
+            return Number(thisItem.alarmTime.split(':')[1]);
+        }
+        return new Date().getMinutes();
+    });
+    const [timeLeft, setTimeLeft] = useState<number | null>(() => {
+        if (thisItem?.alarmTime) {
+            const [h, m] = thisItem.alarmTime.split(':').map(Number);
+            return timeToAlarm(h, m);
+        }
+        return null;
+    });
+
+    const [prevAlarmTime, setPrevAlarmTime] = useState(thisItem?.alarmTime);
+    const [prevItemId, setPrevItemId] = useState(itemId);
+
+    if (thisItem?.alarmTime !== prevAlarmTime || itemId !== prevItemId) {
+        setPrevAlarmTime(thisItem?.alarmTime);
+        setPrevItemId(itemId);
+        if (thisItem?.alarmTime) {
+            const [h, m] = thisItem.alarmTime.split(':').map(Number);
+            setHours(h);
+            setMins(m);
+            setIsSet(true);
+            setTimeLeft(timeToAlarm(h, m));
+        } else {
+            const now = new Date();
+            setHours(now.getHours());
+            setMins(now.getMinutes());
+            setIsSet(false);
+            setTimeLeft(null);
+        }
+    }
+
     const hasFired = useRef(false);
 
     const playAlarm = useCallback(() => {
@@ -35,54 +74,43 @@ const ClockAlarm = ({ itemId, value }: { itemId: string, value: string }) => {
 
         if ("Notification" in globalThis) {
             if (Notification.permission === "granted") {
-                new Notification("Alarma", { body: message, icon:'/public/perrotontogilipollas.png'});
+                new Notification("Alarma", { body: message, icon: '/public/perrotontogilipollas.png' });
             } else {
                 alert(message);
             }
         } else {
             alert(message);
         }
-    },[thisItem]);
+    }, [thisItem]);
 
     useEffect(() => {
-        let interval: ReturnType<typeof setInterval>;
-
-        if (thisItem?.alarmTime) {
-            const [h, m] = thisItem.alarmTime.split(':').map(Number);
-            setHours(h);
-            setMins(m);
-            setIsSet(true);
-
-            const checkAlarm = () => {
-                const now = new Date();
-                const currentH = now.getHours();
-                const currentM = now.getMinutes();
-
-                if (currentH === h && currentM === m) {
-                    if (!hasFired.current) {
-                        playAlarm();
-                        hasFired.current = true;
-                    }
-                } else {
-                    hasFired.current = false;
-                }
-
-                setTimeLeft(timeToAlarm(h, m));
-            };
-
-            checkAlarm();
-            interval = setInterval(checkAlarm, 1000);
-        } else {
-            const now = new Date();
-            setHours(now.getHours());
-            setMins(now.getMinutes());
-            setIsSet(false);
-            setTimeLeft(null);
+        if (!isSet || !thisItem?.alarmTime) {
             hasFired.current = false;
+            return;
         }
 
+        const [h, m] = thisItem.alarmTime.split(':').map(Number);
+
+        const checkAlarm = () => {
+            const now = new Date();
+            const currentH = now.getHours();
+            const currentM = now.getMinutes();
+
+            if (currentH === h && currentM === m) {
+                if (!hasFired.current) {
+                    playAlarm();
+                    hasFired.current = true;
+                }
+            } else {
+                hasFired.current = false;
+            }
+
+            setTimeLeft(timeToAlarm(h, m));
+        };
+
+        const interval = setInterval(checkAlarm, 1000);
         return () => clearInterval(interval);
-    }, [itemId, thisItem?.alarmTime, thisItem?.itemName, playAlarm]);
+    }, [isSet, thisItem?.alarmTime, playAlarm]);
 
     const handleSetAlarm = () => {
         if ("Notification" in globalThis && Notification.permission === "default") {
