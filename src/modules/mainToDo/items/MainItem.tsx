@@ -10,7 +10,6 @@ import { DeleteOutline, ExpandMore, ExpandLess, LibraryAdd } from '@mui/icons-ma
 import type { ToDoItem } from "../../../types/StoreTypes";
 import CreateChildForm from "../forms/CreateChildForm";
 import ChildItem from "./ChildItem";
-import useTimer from "../../../hooks/useTimer";
 
 interface MainItemProps {
     item: ToDoItem;
