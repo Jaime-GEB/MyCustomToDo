@@ -1,14 +1,14 @@
 import {
     Box,
-    Accordion, 
-    AccordionDetails , 
-    AccordionSummary , 
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
 } from "@mui/material";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { SideContent } from "../mainToDo/components/customComponents";
 import SideForm from './sideForm/SideForm';
 import Timer from "./clockComponents/Timer";
-import ClockAlarm from "./clockComponents/clockAlarm";
+import ClockAlarm from "./clockComponents/ClockAlarm";
 
 const SideInfo = ({ itemId, value }: { itemId: string, value: string }) => {
 
@@ -31,7 +31,7 @@ const SideInfo = ({ itemId, value }: { itemId: string, value: string }) => {
                     </AccordionSummary>
                     <AccordionDetails>
                         <Box className='flex flex-col gap-5 w-full items-center justify-center mb-5'>
-                            <ClockAlarm itemId={itemId} value={value}/>
+                            <ClockAlarm itemId={itemId} value={value} />
                         </Box>
                     </AccordionDetails>
                 </Accordion>
@@ -57,7 +57,7 @@ const SideInfo = ({ itemId, value }: { itemId: string, value: string }) => {
                 </Accordion>
             </section>
         </SideContent>
-        
+
     );
 
 }
