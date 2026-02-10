@@ -1,0 +1,14 @@
+docs
+node_modules
+dist
+Dockerfile
+docker-compose.yml
+.git
+.gitignore
+.github
+.vscode
+*.log
+coverage
+*.tsbuildinfo
+.env.development
+cert/*.bat

@@ -7,7 +7,8 @@ import MainToDo from "../modules/mainToDo/MainToDo";
 
 const Home = () => {
     const updatedLists = useToDoStore(useShallow((state) => state.getAllLists()));
-    const [value, setValue] = useState<string>('new');
+    const {currentListId} =useToDoStore()
+    const [value, setValue] = useState<string>(currentListId);
     console.log(value);
 
     const handleSuccess = () =>{

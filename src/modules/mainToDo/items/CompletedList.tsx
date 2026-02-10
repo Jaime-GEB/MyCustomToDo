@@ -11,7 +11,7 @@ import {
     Typography
 } from "@mui/material";
 import { DeleteOutline, ExpandMore, ExpandLess } from '@mui/icons-material';
-import useToDoStore from "../../store/todoStore/ToDoStore";
+import useToDoStore from "../../../store/todoStore/ToDoStore";
 import { useShallow } from "zustand/shallow";
 
 const CompletedList = ({ value }: { value: string }) => {

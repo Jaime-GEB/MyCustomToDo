@@ -3,7 +3,6 @@ import { devtools, persist } from 'zustand/middleware';
 import {
     type ToDoListId,
     type ToDoItemId,
-    type PriorityLevel,
     type ToDoList,
     type ToDoItem,
     type ToDoState,
@@ -22,6 +21,7 @@ const useToDoStore = create<ToDoState>()(
                 /* --- ENTIDADES (Estado inicial) --- */
                 lists: {},
                 items: {},
+                currentListId: 'new',
 
                 /* --- ORDEN --- */
                 listsOrder: [],
@@ -68,6 +68,10 @@ const useToDoStore = create<ToDoState>()(
 
                 /* --- ACCIONES SOBRE LISTAS --- */
 
+                /** Añade la lista activa. */
+                setCurrentList: (currentListId) =>
+                    set({ currentListId }),
+
                 /** Añade una nueva lista. */
                 addList: (listName, listDescription) =>
                     set((state) => {
@@ -83,7 +87,8 @@ const useToDoStore = create<ToDoState>()(
                         return {
                             lists: { ...state.lists, [listId]: newList },
                             listsOrder: [...state.listsOrder, listId],
-                            itemsOrderByList: { ...state.itemsOrderByList, [listId]: [] }
+                            itemsOrderByList: { ...state.itemsOrderByList, [listId]: [] },
+                            currentListId: listId
                         };
                     }, false, 'lists/addList'),
 
@@ -106,7 +111,7 @@ const useToDoStore = create<ToDoState>()(
                     set((state) => {
                         if (!state.lists[listId]) return state;
 
-                        const { [listId]: _, ...remainingLists } = state.lists;
+                        const { [listId]: _unused, ...remainingLists } = state.lists;
                         const newListsOrder = state.listsOrder.filter(id => id !== listId);
 
                         let newItems = state.items;
@@ -116,8 +121,8 @@ const useToDoStore = create<ToDoState>()(
                             itemIdsToRemove.forEach(id => delete newItems[id]);
                         }
 
-                        const { [listId]: __, ...remainingOrders } = state.itemsOrderByList;
-                        const { [listId]: ___, ...remainingFilters } = state.itemsFilterByList || {};
+                        const { [listId]: __unused, ...remainingOrders } = state.itemsOrderByList;
+                        const { [listId]: ___unused, ...remainingFilters } = state.itemsFilterByList || {};
 
                         return {
                             lists: remainingLists,
@@ -154,7 +159,8 @@ const useToDoStore = create<ToDoState>()(
                             itemDescription,
                             itemPriorityLevel: priority,
                             itemParent,
-                            itemCompleted: false
+                            itemCompleted: false,
+                            alarmTime: null,
                         };
 
                         return {
@@ -220,7 +226,7 @@ const useToDoStore = create<ToDoState>()(
                         const item = state.items[itemId];
                         if (!item) return state;
 
-                        const { [itemId]: _, ...remainingItems } = state.items;
+                        const { [itemId]: _unused, ...remainingItems } = state.items;
                         const listId = item.listId;
                         const newListOrder = (state.itemsOrderByList[listId] || []).filter(id => id !== itemId);
 
@@ -283,53 +289,43 @@ const useToDoStore = create<ToDoState>()(
                         };
                     }, false, 'items/moveItem'),
 
-                /** Elimina todos los ítems completados de una lista. */
-                clearCompletedInList: (listId) =>
-                    set((state) => {
-                        const itemIds = state.itemsOrderByList[listId] || [];
-                        const completedIds = itemIds.filter(id => state.items[id]?.itemCompleted);
+                // /** Elimina todos los ítems completados de una lista. */
+                // clearCompletedInList: (listId) =>
+                //     set((state) => {
+                //         const itemIds = state.itemsOrderByList[listId] || [];
+                //         const completedIds = itemIds.filter(id => state.items[id]?.itemCompleted);
 
-                        if (completedIds.length === 0) return state;
+                //         if (completedIds.length === 0) return state;
 
-                        const newItems = { ...state.items };
-                        completedIds.forEach(id => delete newItems[id]);
+                //         const newItems = { ...state.items };
+                //         completedIds.forEach(id => delete newItems[id]);
 
-                        const newOrder = itemIds.filter(id => !completedIds.includes(id));
+                //         const newOrder = itemIds.filter(id => !completedIds.includes(id));
 
-                        return {
-                            items: newItems,
-                            itemsOrderByList: {
-                                ...state.itemsOrderByList,
-                                [listId]: newOrder
-                            }
-                        };
-                    }, false, 'items/clearCompletedInList'),
+                //         return {
+                //             items: newItems,
+                //             itemsOrderByList: {
+                //                 ...state.itemsOrderByList,
+                //                 [listId]: newOrder
+                //             }
+                //         };
+                //     }, false, 'items/clearCompletedInList'),
 
-                /** Cambia la indentación de un ítem (incrementa o decrementa el nivel de prioridad entre 1 y 5). */
-                indentItem: (itemId, delta) =>
+                /** Establece una alarma para ese item */
+                setAlarm: (itemId, alarmTime) =>
                     set((state) => {
                         const item = state.items[itemId];
                         if (!item) return state;
 
-                        const newLevel = Math.max(1, Math.min(5, item.itemPriorityLevel + delta)) as PriorityLevel;
-                        if (newLevel === item.itemPriorityLevel) return state;
-
                         return {
                             items: {
                                 ...state.items,
-                                [itemId]: { ...item, itemPriorityLevel: newLevel }
+                                [itemId]: { ...item, alarmTime: alarmTime }
                             }
                         };
-                    }, false, 'items/indentItem'),
 
-                /** Establece el filtro para una lista específica. */
-                setItemFilter: (listId, filter) =>
-                    set((state) => ({
-                        itemsFilterByList: {
-                            ...(state.itemsFilterByList),
-                            [listId]: filter
-                        }
-                    }), false, 'filters/setItemFilter'),
+                    }),
+
 
                 /* --- HIDRATACIÓN --- */
 
@@ -363,7 +359,8 @@ const useToDoStore = create<ToDoState>()(
                     items: state.items,
                     listsOrder: state.listsOrder,
                     itemsOrderByList: state.itemsOrderByList,
-                    itemsFilterByList: state.itemsFilterByList
+                    itemsFilterByList: state.itemsFilterByList,
+                    currentListId: state.currentListId
                 }),
             }
         ),

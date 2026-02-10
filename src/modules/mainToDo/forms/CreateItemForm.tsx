@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Paper, InputBase, IconButton } from "@mui/material";
 import { Add } from '@mui/icons-material';
-import useToDoStore from "../../store/todoStore/ToDoStore";
-import type { PriorityLevel } from "../../types/StoreTypes";
+import useToDoStore from "../../../store/todoStore/ToDoStore";
+import type { PriorityLevel } from "../../../types/StoreTypes";
 
 interface CreateItemFormProps {
     listId: string;
