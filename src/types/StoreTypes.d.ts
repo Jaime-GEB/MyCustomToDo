@@ -82,7 +82,7 @@ export interface ToDoState {
   // mover entre listas (cambia pertenencia + orden)
   moveItem: (itemId: ToDoItemId, toListId: ToDoListId, toIndex?: number) => void;
 
-  setAlarm: (itemId: ToDoItemId, alarmTime: string) => void;
+  setAlarm: (itemId: ToDoItemId, alarmTime: string|null) => void;
 
   // ---------- Hidrataciones ----------
   hydrate: (payload: {

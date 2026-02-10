@@ -17,7 +17,7 @@ const AlarmScrubber= ({value, unit, isSet, onChange}: {value: number, unit: stri
       const deltaY = eMove.clientY - startYRef.current;
       const valueWhenUp = startValueRef.current - Math.round(deltaY);
 
-      onChange(Math.min(maxInput, Math.max(0, Math.round(valueWhenUp/20))));
+      onChange(Math.min(maxInput, Math.max(0, Math.round(valueWhenUp/5))));
     };
 
     const handleUp = () => {

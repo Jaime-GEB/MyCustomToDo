@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import AlarmScrubber from "../../mainToDo/components/AlarmScrubber";
 import { Typography, Button } from "@mui/material";
 import useToDoStore from "../../../store/todoStore/ToDoStore";
@@ -18,12 +18,31 @@ const timeToAlarm = (hours: number, mins: number) => {
 
 const ClockAlarm = ({ itemId, value }: { itemId: string, value: string }) => {
     const [isSet, setIsSet] = useState(false);
-    const [timeLeft, setTimeLeft] = useState<number>(null)
+    const [timeLeft, setTimeLeft] = useState<number | null>(null)
     const [hours, setHours] = useState(new Date().getHours());
     const [mins, setMins] = useState(new Date().getMinutes());
     const setAlarm = useToDoStore((state) => state.setAlarm);
     const items = useToDoStore(useShallow((state) => state.getVisibleItemsInList(value)));
     const thisItem = items.find((item) => item.itemId === itemId);
+    const hasFired = useRef(false);
+
+    const playAlarm = useCallback(() => {
+        const audio = new Audio('/alarma.mp3');
+        audio.play().catch(e => console.error("Error playing audio:", e));
+
+        const title = thisItem?.itemName || "Tarea";
+        const message = `Se ha cumplido la alarma de la tarea "${title}"`;
+
+        if ("Notification" in globalThis) {
+            if (Notification.permission === "granted") {
+                new Notification("Alarma", { body: message });
+            } else {
+                alert(message);
+            }
+        } else {
+            alert(message);
+        }
+    },[thisItem]);
 
     useEffect(() => {
         let interval: ReturnType<typeof setInterval>;
@@ -34,25 +53,51 @@ const ClockAlarm = ({ itemId, value }: { itemId: string, value: string }) => {
             setMins(m);
             setIsSet(true);
 
-            const updateTime = () => setTimeLeft(timeToAlarm(h, m));
-            updateTime();
-            interval = setInterval(updateTime, 60000);
+            const checkAlarm = () => {
+                const now = new Date();
+                const currentH = now.getHours();
+                const currentM = now.getMinutes();
+
+                if (currentH === h && currentM === m) {
+                    if (!hasFired.current) {
+                        playAlarm();
+                        hasFired.current = true;
+                    }
+                } else {
+                    hasFired.current = false;
+                }
+
+                setTimeLeft(timeToAlarm(h, m));
+            };
+
+            checkAlarm();
+            interval = setInterval(checkAlarm, 1000);
         } else {
             const now = new Date();
             setHours(now.getHours());
             setMins(now.getMinutes());
             setIsSet(false);
             setTimeLeft(null);
+            hasFired.current = false;
         }
 
         return () => clearInterval(interval);
-    }, [itemId, thisItem?.alarmTime]);
+    }, [itemId, thisItem?.alarmTime, thisItem?.itemName, playAlarm]);
 
     const handleSetAlarm = () => {
+        if ("Notification" in globalThis && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
         const alarmTime = `${hours}:${mins}`;
         setIsSet(true);
         setAlarm(itemId, alarmTime);
+        hasFired.current = false;
     };
+
+    const handleDeleteAlarm = () => {
+        setAlarm(itemId, null);
+        setTimeLeft(null)
+    }
 
     const formatTimeLeft = (ms: number) => {
         if (ms === null) return "";
@@ -74,9 +119,14 @@ const ClockAlarm = ({ itemId, value }: { itemId: string, value: string }) => {
                     {formatTimeLeft(timeLeft)}
                 </Typography>
             )}
-            <Button variant="contained" onClick={handleSetAlarm}>
-                Establecer Alarma
-            </Button>
+            <div className="flex flex-row gap-5">
+                <Button variant="contained" onClick={handleSetAlarm}>
+                    Establecer Alarma
+                </Button>
+                <Button variant="contained" color="error" onClick={handleDeleteAlarm}>
+                    Eliminar Alarma
+                </Button>
+            </div>
         </section>
 
     );

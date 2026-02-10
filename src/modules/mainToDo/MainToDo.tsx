@@ -44,7 +44,8 @@ const MainToDo = ({ value }: { value: string }) => {
      */
     const handleChildBtn = (itemParent: ItemParent) => {
         setChildBtnClicked(!childBtnClicked);
-        !childBtnClicked ? setCreateChild(itemParent) : setCreateChild('');
+        if(childBtnClicked) setCreateChild(itemParent); 
+        else setCreateChild('');
     };
 
     /**
