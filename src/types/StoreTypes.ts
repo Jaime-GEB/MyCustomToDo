@@ -1,4 +1,3 @@
-import { ItemParent } from './StoreTypes.d';
 // ---------- IDs y enums ----------
 
 export type ToDoListId = string;
@@ -82,7 +81,7 @@ export interface ToDoState {
   // mover entre listas (cambia pertenencia + orden)
   moveItem: (itemId: ToDoItemId, toListId: ToDoListId, toIndex?: number) => void;
 
-  setAlarm: (itemId: ToDoItemId, alarmTime: string|null) => void;
+  setAlarm: (itemId: ToDoItemId, alarmTime: string | null) => void;
 
   // ---------- Hidrataciones ----------
   hydrate: (payload: {

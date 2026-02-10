@@ -1,6 +1,6 @@
 import { useState, type KeyboardEvent } from "react";
 import { Paper, InputBase, IconButton } from "@mui/material";
-import { Add } from '@mui/icons-material';
+import AddIcon from '@mui/icons-material/Add';
 import useToDoStore from "../../../store/todoStore/ToDoStore";
 import type { PriorityLevel } from "../../../types/StoreTypes";
 
@@ -42,11 +42,11 @@ const CreateChildForm = ({ listId, parentId, parentPriority, onClose }: CreateCh
         }
     };
 
-    const handleCloseEditChild = (e: KeyboardEvent<HTMLDivElement>) => {
-            if (e.key === 'Escape') {
-                onClose()
-            }
+    const handleCloseEditChild = (e: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (e.key === 'Escape') {
+            onClose()
         }
+    }
 
     // Coincide con la lógica de indentación de ChildItem: 40px * prioridad
     // Se usa la prioridad del padre porque el nuevo item será su hijo inmediato visualmente en este contexto
@@ -99,7 +99,7 @@ const CreateChildForm = ({ listId, parentId, parentPriority, onClose }: CreateCh
                 }}
                 disabled={!newItemChildName.trim()}
             >
-                <Add />
+                <AddIcon />
             </IconButton>
         </Paper>
     );

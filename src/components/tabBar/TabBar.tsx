@@ -1,5 +1,6 @@
 import { Tabs, Tab, Tooltip } from '@mui/material';
-import { Close, Add } from "@mui/icons-material"
+import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
 import { useShallow } from "zustand/shallow";
 import useToDoStore from "../../store/todoStore/ToDoStore";
 import { type Dispatch, type SetStateAction } from "react";
@@ -7,7 +8,7 @@ import { type Dispatch, type SetStateAction } from "react";
 const TabBar = ({ value, setValue }: { value: string, setValue: Dispatch<SetStateAction<string>> }) => {
     const allLists = useToDoStore(useShallow((store) => store.getAllLists()));
     const removeList = useToDoStore((store) => store.removeList);
-    const setCurrentList = useToDoStore((store)=>store.setCurrentList)
+    const setCurrentList = useToDoStore((store) => store.setCurrentList)
 
     return (
         <section className="flex border-x-2 border-slate-200 dark:border-slate-800 w-[92%] h-10 items-center px-4">
@@ -29,7 +30,7 @@ const TabBar = ({ value, setValue }: { value: string, setValue: Dispatch<SetStat
                             label={list.listName}
                             onClick={() => setCurrentList(list.listId)}
                             icon={
-                                <Close
+                                <CloseIcon
                                     sx={{
                                         fontSize: 16,
                                         borderRadius: '50%',
@@ -38,8 +39,8 @@ const TabBar = ({ value, setValue }: { value: string, setValue: Dispatch<SetStat
                                         transition: 'all 0.2s',
                                         '&:hover': { bgcolor: 'error.light', color: 'error.contrastText' }
                                     }}
-                                    onPointerDown={(e) => e.stopPropagation()}
-                                    onClick={(e) => {
+                                    onPointerDown={(e: React.PointerEvent) => e.stopPropagation()}
+                                    onClick={(e: React.MouseEvent) => {
                                         e.stopPropagation();
                                         removeList(list.listId);
                                         setValue('new')
@@ -79,7 +80,7 @@ const TabBar = ({ value, setValue }: { value: string, setValue: Dispatch<SetStat
                 <Tooltip title="Crear Lista">
                     <Tab
                         value="new"
-                        icon={<Add sx={{ fontSize: 22, color: value === "new" ? 'primary.main' : 'text.disabled', borderRadius: '50%', p: 0.2, '&:hover': { bgcolor: 'action.hover' } }} />}
+                        icon={<AddIcon sx={{ fontSize: 22, color: value === "new" ? 'primary.main' : 'text.disabled', borderRadius: '50%', p: 0.2, '&:hover': { bgcolor: 'action.hover' } }} />}
                         iconPosition="start"
                         sx={{ minWidth: 48, minHeight: 40 }}
                     />

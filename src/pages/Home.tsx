@@ -7,23 +7,23 @@ import MainToDo from "../modules/mainToDo/MainToDo";
 
 const Home = () => {
     const updatedLists = useToDoStore(useShallow((state) => state.getAllLists()));
-    const {currentListId} =useToDoStore()
+    const { currentListId } = useToDoStore()
     const [value, setValue] = useState<string>(currentListId);
     console.log(value);
 
-    const handleSuccess = () =>{
+    const handleSuccess = () => {
         if (updatedLists.length > 0) {
-            setValue(updatedLists.at(-1).listId);
+            setValue(updatedLists.at(-1)?.listId || value);
         }
     }
 
-    return(
-        <MainLayout value={value} setValue={setValue}> 
+    return (
+        <MainLayout value={value} setValue={setValue}>
             <section>
-                {value==='new'?
-                    <CreateList onSuccess={handleSuccess}/>
+                {value === 'new' ?
+                    <CreateList onSuccess={handleSuccess} />
                     :
-                    <MainToDo value={value}/>
+                    <MainToDo value={value} />
                 }
             </section>
         </MainLayout>
