@@ -226,7 +226,7 @@ const useToDoStore = create<ToDoState>()(
                         const item = state.items[itemId];
                         if (!item) return state;
 
-                        const { [itemId]: _, ...remainingItems } = state.items;
+                        const { [itemId]: _unused, ...remainingItems } = state.items;
                         const listId = item.listId;
                         const newListOrder = (state.itemsOrderByList[listId] || []).filter(id => id !== itemId);
 
