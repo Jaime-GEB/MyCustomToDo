@@ -47,7 +47,6 @@ const MainItem = ({
     deployChildren,
     allItems
 }: MainItemProps) => {
-    const {isRunning, segundos, minutos, horas} = useTimer()
 
     if (item.itemParent === undefined || item.itemParent === null) return (
         <>
