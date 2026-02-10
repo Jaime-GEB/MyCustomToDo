@@ -35,7 +35,7 @@ const ClockAlarm = ({ itemId, value }: { itemId: string, value: string }) => {
 
         if ("Notification" in globalThis) {
             if (Notification.permission === "granted") {
-                new Notification("Alarma", { body: message });
+                new Notification("Alarma", { body: message, icon:'/public/perrotontogilipollas.png'});
             } else {
                 alert(message);
             }

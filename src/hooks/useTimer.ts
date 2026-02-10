@@ -33,7 +33,7 @@ import { useEffect, useRef, useState } from "react";
         segundos,
         minutos,
         horas,
-        reset: () => setSegundos(0),
+        reset: () => {setSegundos(0); setMinutos(0); setHoras(0)},
         toggle: () => setIsRunning(v => !v),
     };
 }
