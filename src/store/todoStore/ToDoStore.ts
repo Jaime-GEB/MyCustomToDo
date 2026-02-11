@@ -112,6 +112,7 @@ const useToDoStore = create<ToDoState>()(
                         if (!state.lists[listId]) return state;
 
                         const { [listId]: _unused, ...remainingLists } = state.lists;
+                        console.log(_unused)
                         const newListsOrder = state.listsOrder.filter(id => id !== listId);
 
                         let newItems = state.items;
@@ -123,7 +124,8 @@ const useToDoStore = create<ToDoState>()(
 
                         const { [listId]: __unused, ...remainingOrders } = state.itemsOrderByList;
                         const { [listId]: ___unused, ...remainingFilters } = state.itemsFilterByList || {};
-
+                        console.log(__unused)
+                        console.log(___unused)
                         return {
                             lists: remainingLists,
                             listsOrder: newListsOrder,
@@ -227,6 +229,7 @@ const useToDoStore = create<ToDoState>()(
                         if (!item) return state;
 
                         const { [itemId]: _unused, ...remainingItems } = state.items;
+                        console.log(_unused)
                         const listId = item.listId;
                         const newListOrder = (state.itemsOrderByList[listId] || []).filter(id => id !== itemId);
 
