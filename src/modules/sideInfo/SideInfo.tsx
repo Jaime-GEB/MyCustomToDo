@@ -8,7 +8,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { SideContent } from "../mainToDo/components/customComponents";
 import SideForm from './sideForm/SideForm';
 import Timer from "./clockComponents/Timer";
-import ClockAlarm from "./clockComponents/ClockAlarm";
+import ClockAlarm from "./clockComponents/clockAlarm";
 
 const SideInfo = ({ itemId, value }: { itemId: string, value: string }) => {
 
