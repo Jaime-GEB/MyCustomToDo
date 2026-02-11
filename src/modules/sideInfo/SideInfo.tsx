@@ -45,16 +45,6 @@ const SideInfo = ({ itemId, value }: { itemId: string, value: string }) => {
                         </Box>
                     </AccordionDetails>
                 </Accordion>
-                <Accordion>
-                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        Calendario
-                    </AccordionSummary>
-                    <AccordionDetails>
-                        <Box className='flex flex-col gap-5 w-full items-center justify-center mb-5'>
-                            <Timer />
-                        </Box>
-                    </AccordionDetails>
-                </Accordion>
             </section>
         </SideContent>
 
