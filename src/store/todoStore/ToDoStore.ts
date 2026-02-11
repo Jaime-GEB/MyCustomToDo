@@ -111,7 +111,7 @@ const useToDoStore = create<ToDoState>()(
                     set((state) => {
                         if (!state.lists[listId]) return state;
 
-                        const { [listId]: _, ...remainingLists } = state.lists;
+                        const { [listId]: _unused, ...remainingLists } = state.lists;
                         const newListsOrder = state.listsOrder.filter(id => id !== listId);
 
                         let newItems = state.items;
@@ -121,8 +121,8 @@ const useToDoStore = create<ToDoState>()(
                             itemIdsToRemove.forEach(id => delete newItems[id]);
                         }
 
-                        const { [listId]: __, ...remainingOrders } = state.itemsOrderByList;
-                        const { [listId]: ___, ...remainingFilters } = state.itemsFilterByList || {};
+                        const { [listId]: __unused, ...remainingOrders } = state.itemsOrderByList;
+                        const { [listId]: ___unused, ...remainingFilters } = state.itemsFilterByList || {};
 
                         return {
                             lists: remainingLists,
@@ -226,7 +226,7 @@ const useToDoStore = create<ToDoState>()(
                         const item = state.items[itemId];
                         if (!item) return state;
 
-                        const { [itemId]: _, ...remainingItems } = state.items;
+                        const { [itemId]: _unused, ...remainingItems } = state.items;
                         const listId = item.listId;
                         const newListOrder = (state.itemsOrderByList[listId] || []).filter(id => id !== itemId);
 
