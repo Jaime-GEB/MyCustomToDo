@@ -9,6 +9,7 @@ import { SideContent } from "../mainToDo/components/customComponents";
 import SideForm from './sideForm/SideForm';
 import Timer from "./clockComponents/Timer";
 import ClockAlarm from "./clockComponents/clockAlarm";
+import Calendar from "./calendar/Calendar";
 
 const SideInfo = ({ itemId, value }: { itemId: string, value: string }) => {
 
@@ -42,6 +43,16 @@ const SideInfo = ({ itemId, value }: { itemId: string, value: string }) => {
                     <AccordionDetails>
                         <Box className='flex flex-col gap-5 w-full items-center justify-center mb-5'>
                             <Timer />
+                        </Box>
+                    </AccordionDetails>
+                </Accordion>
+                <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        Calendario
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <Box className='flex flex-col gap-5 w-full items-center justify-center mb-5'>
+                            <Calendar itemId={itemId} />
                         </Box>
                     </AccordionDetails>
                 </Accordion>
