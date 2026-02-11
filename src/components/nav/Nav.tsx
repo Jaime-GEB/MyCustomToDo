@@ -22,9 +22,9 @@ const Nav = ({ value, setValue }: { value: string, setValue: Dispatch<SetStateAc
         <nav className="flex flex-row p-3 md:px-6 justify-between items-center border-b border-slate-200 dark:border-slate-800 bg-grey-200 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
 
             {/* Titulo de la pagina */}
-            <div className="flex items-center justify-center gap-2 mr-3 min-w-20">
+            <div className="flex flex-col items-center justify-center gap-2 mr-3 min-w-20">
                 <h1 className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">To Do</h1>
-                <footer className="text-slate-600">v.1.0.3</footer>
+                <footer className="text-slate-600 text-s">v.1.0.3</footer>
             </div>
 
             <TabBar value={value} setValue={setValue} />
