@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/ToDo-custom
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/mycustomtodo
 
 jobs:
   test:
