@@ -9,7 +9,7 @@ REM Genera certificado autofirmado
 openssl x509 -req -days 365 -in cert.csr -signkey key.pem -out cert.pem
 
 REM Genera un certificado confiado por el navegador
-cat your_certificate.pem intermediate.pem > fullchain.pem
+cat cert.pem intermediate.pem > fullchain.pem
 
 REM Muestra información del certificado
 openssl x509 -in cert.pem -text -noout
