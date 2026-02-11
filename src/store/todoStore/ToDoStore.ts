@@ -163,6 +163,7 @@ const useToDoStore = create<ToDoState>()(
                             itemParent,
                             itemCompleted: false,
                             alarmTime: null,
+                            itemDeadline: null, // Inicialmente sin fecha límite
                         };
 
                         return {
@@ -326,8 +327,21 @@ const useToDoStore = create<ToDoState>()(
                                 [itemId]: { ...item, alarmTime: alarmTime }
                             }
                         };
+                    }, false, 'items/setAlarm'),
 
-                    }),
+                /** Establece o elimina la fecha límite de un ítem. */
+                setDeadline: (itemId, deadline) =>
+                    set((state) => {
+                        const item = state.items[itemId];
+                        if (!item) return state;
+
+                        return {
+                            items: {
+                                ...state.items,
+                                [itemId]: { ...item, itemDeadline: deadline }
+                            }
+                        };
+                    }, false, 'items/setDeadline'),
 
 
                 /* --- HIDRATACIÓN --- */

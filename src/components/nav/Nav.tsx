@@ -24,7 +24,7 @@ const Nav = ({ value, setValue }: { value: string, setValue: Dispatch<SetStateAc
             {/* Titulo de la pagina */}
             <div className="flex flex-col items-center justify-center gap-2 mr-3 min-w-20">
                 <h1 className="font-bold text-xl tracking-tight text-slate-900 dark:text-white">To Do</h1>
-                <footer className="text-slate-600 text-xs">v.1.0.3</footer>
+                <footer className="text-slate-600 text-xs -mt-3.5">v.1.1.0</footer>
             </div>
 
             <TabBar value={value} setValue={setValue} />

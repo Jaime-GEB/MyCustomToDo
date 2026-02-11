@@ -24,7 +24,8 @@ export interface ToDoItem {
   itemPriorityLevel: PriorityLevel;
   itemParent: ItemParent
   listId: ToDoListId;
-  alarmTime: string | null
+  alarmTime: string | null;
+  itemDeadline: string | null; // Fecha límite del ítem (formato ISO o string de fecha)
 }
 
 // ---------- Estado del store ----------
@@ -82,6 +83,9 @@ export interface ToDoState {
   moveItem: (itemId: ToDoItemId, toListId: ToDoListId, toIndex?: number) => void;
 
   setAlarm: (itemId: ToDoItemId, alarmTime: string | null) => void;
+
+  /** Establece o elimina la fecha límite de un ítem. */
+  setDeadline: (itemId: ToDoItemId, deadline: string | null) => void;
 
   // ---------- Hidrataciones ----------
   hydrate: (payload: {
