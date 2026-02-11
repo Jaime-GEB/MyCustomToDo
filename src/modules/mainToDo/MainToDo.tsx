@@ -14,6 +14,8 @@ import CreateItemForm from "./forms/CreateItemForm";
 import SideInfo from "../sideInfo/SideInfo";
 import { MainBody } from "./components/customComponents";
 
+import { AnimatePresence, motion } from "framer-motion";
+
 /**
  * Componente principal que renderiza la lista de tareas.
  * Gestiona el estado local de la creación de subtareas y coordina la renderización de items principales y secundarios.
@@ -44,7 +46,7 @@ const MainToDo = ({ value }: { value: string }) => {
      */
     const handleChildBtn = (itemParent: ItemParent) => {
         setChildBtnClicked(!childBtnClicked);
-        if(childBtnClicked) setCreateChild(itemParent); 
+        if (childBtnClicked) setCreateChild(itemParent);
         else setCreateChild('');
     };
 
@@ -106,29 +108,31 @@ const MainToDo = ({ value }: { value: string }) => {
                 <CreateItemForm listId={value} />
 
                 <List sx={{ p: 0, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                    {/* Renderizado unicamente de items padres */}
-                    {items.filter(item => !item.itemParent).map((item) => {
-                        const absoluteIndex = items.findIndex(i => i.itemId === item.itemId);
-                        return item.itemCompleted === false ? (
-                            <Box key={item.itemId}>
-                                <MainItem
-                                    item={item}
-                                    index={absoluteIndex}
-                                    listId={value}
-                                    onToggle={toggleItem}
-                                    onRemove={removeItem}
-                                    onReOrder={handleReOrder}
-                                    onAddChildBtn={handleChildBtn}
-                                    onOpenDrawer={handleOpenDrawer}
-                                    createChild={createChild} // Pasamos el ID del item siendo editado
-                                    onCloseChildForm={() => setCreateChild('')}
-                                    onDeployChildren={toggleExpand}
-                                    deployChildren={expandedItems}
-                                    allItems={items} // Pasamos la lista completa para buscar hijos
-                                />
-                            </Box>
-                        ) : null
-                    })}
+                    <AnimatePresence mode="popLayout">
+                        {/* Renderizado unicamente de items padres */}
+                        {items.filter(item => !item.itemParent).map((item) => {
+                            const absoluteIndex = items.findIndex(i => i.itemId === item.itemId);
+                            return item.itemCompleted === false ? (
+                                <Box key={item.itemId}>
+                                    <MainItem
+                                        item={item}
+                                        index={absoluteIndex}
+                                        listId={value}
+                                        onToggle={toggleItem}
+                                        onRemove={removeItem}
+                                        onReOrder={handleReOrder}
+                                        onAddChildBtn={handleChildBtn}
+                                        onOpenDrawer={handleOpenDrawer}
+                                        createChild={createChild} // Pasamos el ID del item siendo editado
+                                        onCloseChildForm={() => setCreateChild('')}
+                                        onDeployChildren={toggleExpand}
+                                        deployChildren={expandedItems}
+                                        allItems={items} // Pasamos la lista completa para buscar hijos
+                                    />
+                                </Box>
+                            ) : null
+                        })}
+                    </AnimatePresence>
                 </List>
                 <CompletedList value={value} />
             </MainBody>
@@ -138,7 +142,15 @@ const MainToDo = ({ value }: { value: string }) => {
                     null
                     :
                     <Drawer variant="persistent" open={openDrawer !== ''} onClose={handleCloseDrawer} anchor="right">
-                        <SideInfo itemId={openDrawer} value={value} />
+                        <motion.div
+                            initial={{ x: '100%', opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: '100%', opacity: 0 }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                            style={{ height: '100%' }}
+                        >
+                            <SideInfo itemId={openDrawer} value={value} />
+                        </motion.div>
                     </Drawer>
 
             }

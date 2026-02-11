@@ -5,6 +5,8 @@ import { useShallow } from "zustand/shallow";
 import useToDoStore from "../../store/todoStore/ToDoStore";
 import { type Dispatch, type SetStateAction } from "react";
 
+import { motion, AnimatePresence } from 'framer-motion';
+
 const TabBar = ({ value, setValue }: { value: string, setValue: Dispatch<SetStateAction<string>> }) => {
     const allLists = useToDoStore(useShallow((store) => store.getAllLists()));
     const removeList = useToDoStore((store) => store.removeList);
@@ -62,6 +64,11 @@ const TabBar = ({ value, setValue }: { value: string, setValue: Dispatch<SetStat
                                 color: value === list.listId ? 'primary.main' : 'text.secondary',
                                 transition: 'all 0.2s',
                                 fontWeight: value === list.listId ? 600 : 400,
+                                animation: 'tab-slide-in 0.3s ease-out',
+                                '@keyframes tab-slide-in': {
+                                    from: { opacity: 0, transform: 'translateX(20px)' },
+                                    to: { opacity: 1, transform: 'translateX(0)' }
+                                },
                                 '&.Mui-selected': {
                                     bgcolor: 'background.paper',
                                     borderColor: 'divider',
