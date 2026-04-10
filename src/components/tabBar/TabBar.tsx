@@ -5,7 +5,6 @@ import { useShallow } from "zustand/shallow";
 import useToDoStore from "../../store/todoStore/ToDoStore";
 import { type Dispatch, type SetStateAction } from "react";
 
-import { motion, AnimatePresence } from 'framer-motion';
 
 const TabBar = ({ value, setValue }: { value: string, setValue: Dispatch<SetStateAction<string>> }) => {
     const allLists = useToDoStore(useShallow((store) => store.getAllLists()));
