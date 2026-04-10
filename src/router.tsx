@@ -13,13 +13,17 @@ const AppRouter = () => {
             </main>
         }>
             <Routes>
-                {/* Redirección condicional desde '/' */}
-                <Route path="/*" element={
-                    <Navigate to="/Home" />
+                {/* Redirección desde '/' */}
+                <Route path="/" element={
+                    <Navigate to="/Home" replace />
                 } />
                 {/* Ruta de MainMenu */}
                 <Route path="/Home" element={
                     <Home />
+                } />
+                {/* Redirección para rutas no encontradas */}
+                <Route path="*" element={
+                    <Navigate to="/Home" replace />
                 } />
             </Routes>
         </Suspense>
