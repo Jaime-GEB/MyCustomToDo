@@ -22,7 +22,7 @@ const Calendar = ({ itemId }: { itemId: string }) => {
 
     // Estado local para la fecha seleccionada en el calendario (sin guardar aún)
     const [tempDate, setTempDate] = useState<Dayjs | null>(
-        thisItem?.itemDeadline ? dayjs(thisItem.itemDeadline) : null
+        () => thisItem?.itemDeadline ? dayjs(thisItem.itemDeadline) : null
     );
 
 
