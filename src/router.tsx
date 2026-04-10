@@ -9,7 +9,7 @@ const AppRouter = () => {
     return (
         <Suspense fallback={
             <main className="h-full w-full flex justify-center items-center ">
-              <CircularProgress />
+                <CircularProgress />
             </main>
         }>
             <Routes>
@@ -19,7 +19,7 @@ const AppRouter = () => {
                 } />
                 {/* Ruta de MainMenu */}
                 <Route path="/Home" element={
-                   <Home />
+                    <Home />
                 } />
             </Routes>
         </Suspense>
