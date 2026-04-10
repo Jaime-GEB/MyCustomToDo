@@ -27,6 +27,8 @@ interface MainItemProps {
     allItems: ToDoItem[];
 }
 
+import { motion, AnimatePresence } from "framer-motion";
+
 /**
  * Renderiza un ítem principal de la lista (aquellos que no tienen padre).
  * Incluye controles para marcar como completado, eliminar y añadir subtareas.
@@ -48,7 +50,13 @@ const MainItem = ({
 }: MainItemProps) => {
 
     if (item.itemParent === undefined || item.itemParent === null) return (
-        <>
+        <motion.div
+            layout
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+        >
             <ListItem
                 disablePadding
                 sx={{
@@ -56,7 +64,6 @@ const MainItem = ({
                     borderRadius: 2,
                     border: '1px solid',
                     borderColor: 'divider',
-                    transition: 'transform 1000ms ease',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                     '&:hover': {
                         borderColor: 'primary.light',
@@ -75,7 +82,7 @@ const MainItem = ({
                         <IconButton
                             edge="end"
                             aria-label="add-child"
-                            onClick={() => { onAddChildBtn(item.itemId); onDeployChildren(item.itemId) }}
+                            onClick={() =>  onAddChildBtn(item.itemId)}
                             sx={{ mr: 1, color: 'text.disabled', '&:hover': { color: 'info.main' } }}
                         >
                             <LibraryAdd />
@@ -117,9 +124,9 @@ const MainItem = ({
                     </ListItemIcon>
                     <ListItemText
                         primary={
-                        <div className="flex flex-row gap-10">
-                            <p>{item.itemName}</p>
-                        </div>
+                            <div className="flex flex-row gap-10">
+                                <p>{item.itemName}</p>
+                            </div>
                         }
                         onDoubleClick={((e) => { onOpenDrawer(item.itemId); e.stopPropagation(); })}
                         sx={{
@@ -135,48 +142,62 @@ const MainItem = ({
                 </ListItemButton>
             </ListItem>
 
-            {createChild === item.itemId && (
-                <CreateChildForm
-                    listId={listId}
-                    parentId={item.itemId}
-                    parentPriority={item.itemPriorityLevel}
-                    onClose={onCloseChildForm}
-                />
-            )}
+            <AnimatePresence>
+                {createChild === item.itemId && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                    >
+                        <CreateChildForm
+                            listId={listId}
+                            parentId={item.itemId}
+                            parentPriority={item.itemPriorityLevel}
+                            onClose={onCloseChildForm}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Renderizado de hijos */}
-            {deployChildren.has(item.itemId) && (
-                <div className="flex flex-col gap-1.5 mt-1.5">
-                    {allItems.filter(child => child.itemParent === item.itemId).map((child) => {
-                        const absoluteIndex = allItems.findIndex(i => i.itemId === child.itemId);
-                        return (
-                            <ChildItem
-                                key={child.itemId}
-                                parentItem={item}
-                                childItem={child}
-                                parentIndex={absoluteIndex}
-                                parentIsCompleted={item.itemCompleted}
-                                listId={listId}
-                                onToggle={onToggle}
-                                onRemove={onRemove}
-                                onReOrder={onReOrder}
-                                onAddChildBtn={onAddChildBtn}
-                                //onOpenDrawer={onOpenDrawer}
-                                createChild={createChild}
-                                showChildForm={createChild === child.itemId}
-                                onCloseChildForm={onCloseChildForm}
-                                onDeployChildren={onDeployChildren}
-                                deployChildren={deployChildren}
-                                allItems={allItems}
-                            />
-                        )
-                    })}
-                </div>
-            )}
-
-
-        </>
+            <AnimatePresence>
+                {deployChildren.has(item.itemId) && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="flex flex-col gap-1.5 mt-1.5"
+                    >
+                        {allItems.filter(child => child.itemParent === item.itemId).map((child) => {
+                            const absoluteIndex = allItems.findIndex(i => i.itemId === child.itemId);
+                            return (
+                                <ChildItem
+                                    key={child.itemId}
+                                    parentItem={item}
+                                    childItem={child}
+                                    parentIndex={absoluteIndex}
+                                    parentIsCompleted={item.itemCompleted}
+                                    listId={listId}
+                                    onToggle={onToggle}
+                                    onRemove={onRemove}
+                                    onReOrder={onReOrder}
+                                    onAddChildBtn={onAddChildBtn}
+                                    //onOpenDrawer={onOpenDrawer}
+                                    createChild={createChild}
+                                    showChildForm={createChild === child.itemId}
+                                    onCloseChildForm={onCloseChildForm}
+                                    onDeployChildren={onDeployChildren}
+                                    deployChildren={deployChildren}
+                                    allItems={allItems}
+                                />
+                            )
+                        })}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
+    return null;
 };
 
 export default MainItem;

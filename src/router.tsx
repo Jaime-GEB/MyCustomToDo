@@ -9,17 +9,21 @@ const AppRouter = () => {
     return (
         <Suspense fallback={
             <main className="h-full w-full flex justify-center items-center ">
-              <CircularProgress />
+                <CircularProgress />
             </main>
         }>
             <Routes>
-                {/* Redirección condicional desde '/' */}
-                <Route path="/*" element={
-                    <Navigate to="/Home" />
+                {/* Redirección desde '/' */}
+                <Route path="/" element={
+                    <Navigate to="/Home" replace />
                 } />
                 {/* Ruta de MainMenu */}
                 <Route path="/Home" element={
-                   <Home />
+                    <Home />
+                } />
+                {/* Redirección para rutas no encontradas */}
+                <Route path="*" element={
+                    <Navigate to="/Home" replace />
                 } />
             </Routes>
         </Suspense>

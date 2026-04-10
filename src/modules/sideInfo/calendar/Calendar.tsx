@@ -2,51 +2,63 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PickersDay, type PickersDayProps } from '@mui/x-date-pickers/PickersDay';
-import { Badge, Box, Typography } from '@mui/material';
+import { Badge, Box, Typography, Button, Stack } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import useToDoStore from '../../../store/todoStore/ToDoStore';
 import { useShallow } from 'zustand/shallow';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 
 /**
- * Componente de Calendario que permite asignar fechas límite a los ítems
- * y visualizar los ítems con fechas límite asignadas.
+ * Componente de Calendario que permite gestionar fechas límite de forma manual
  */
 const Calendar = ({ itemId }: { itemId: string }) => {
-    // Obtenemos los ítems y la acción para establecer la fecha límite del store
     const items = useToDoStore(useShallow((state) => state.items));
     const setDeadline = useToDoStore((state) => state.setDeadline);
 
-    // Ítem seleccionado actualmente
     const thisItem = items[itemId];
 
-    // Función para manejar el cambio de fecha
-    const handleDateChange = (date: Dayjs | null) => {
-        if (itemId && date) {
-            // Guardamos la fecha en formato ISO
-            setDeadline(itemId, date.toISOString());
+    // Estado local para la fecha seleccionada en el calendario (sin guardar aún)
+    const [tempDate, setTempDate] = useState<Dayjs | null>(
+        thisItem?.itemDeadline ? dayjs(thisItem.itemDeadline) : null
+    );
+
+    // Sincronizar el estado local cuando cambia el ítem seleccionado
+    useEffect(() => {
+        if (thisItem) {
+            setTempDate(thisItem.itemDeadline ? dayjs(thisItem.itemDeadline) : null);
+        }
+    }, [itemId, thisItem?.itemDeadline]);
+
+    const handleSaveDate = () => {
+        if (itemId && tempDate) {
+            setDeadline(itemId, tempDate.toISOString());
         }
     };
 
-    // Obtenemos todas las fechas límite de todos los ítems para resaltarlas
+    const handleRemoveDate = () => {
+        if (itemId) {
+            setDeadline(itemId, null);
+            setTempDate(null);
+        }
+    };
+
     const highlightedDays = Object.values(items)
         .map(item => item.itemDeadline)
         .filter((deadline): deadline is string => !!deadline)
         .map(deadline => dayjs(deadline).format('YYYY-MM-DD'));
 
-    /**
-     * Componente personalizado para renderizar los días del calendario.
-     * Añade un pequeño punto (Badge) si el día tiene una tarea con fecha límite.
-     */
     const ServerDay = (props: PickersDayProps) => {
         const { day, outsideCurrentMonth, ...other } = props;
-
-        const isSelected = !props.outsideCurrentMonth && highlightedDays.indexOf(day.format('YYYY-MM-DD')) >= 0;
+        const isHighlighted = !props.outsideCurrentMonth && highlightedDays.indexOf(day.format('YYYY-MM-DD')) >= 0;
 
         return (
             <Badge
                 key={props.day.toString()}
                 overlap="circular"
-                badgeContent={isSelected ? '•' : undefined}
+                badgeContent={isHighlighted ? '•' : undefined}
                 color="secondary"
             >
                 <PickersDay {...other} outsideCurrentMonth={outsideCurrentMonth} day={day} />
@@ -60,11 +72,12 @@ const Calendar = ({ itemId }: { itemId: string }) => {
                 {thisItem ? (
                     <>
                         <Typography variant="body2" className="mb-2 opacity-70">
-                            Establecer fecha límite para: <strong>{thisItem.itemName}</strong>
+                            Gestionar fecha para: <strong>{thisItem.itemName}</strong>
                         </Typography>
+
                         <DateCalendar
-                            value={thisItem.itemDeadline ? dayjs(thisItem.itemDeadline) : null}
-                            onChange={handleDateChange}
+                            value={tempDate}
+                            onChange={(newValue) => setTempDate(newValue)}
                             slots={{
                                 day: ServerDay,
                             }}
@@ -75,6 +88,43 @@ const Calendar = ({ itemId }: { itemId: string }) => {
                                 },
                             }}
                         />
+
+                        <AnimatePresence mode="popLayout">
+                            <Stack direction="row" spacing={2} className="mt-4">
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                >
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        startIcon={<EventAvailableIcon />}
+                                        onClick={handleSaveDate}
+                                        disabled={!tempDate || tempDate.toISOString() === thisItem.itemDeadline}
+                                    >
+                                        Añadir Fecha
+                                    </Button>
+                                </motion.div>
+
+                                {thisItem.itemDeadline && (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.5 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.5 }}
+                                    >
+                                        <Button
+                                            variant="outlined"
+                                            color="error"
+                                            startIcon={<EventBusyIcon />}
+                                            onClick={handleRemoveDate}
+                                        >
+                                            Eliminar Fecha
+                                        </Button>
+                                    </motion.div>
+                                )}
+                            </Stack>
+                        </AnimatePresence>
                     </>
                 ) : (
                     <Typography variant="body2" color="error">

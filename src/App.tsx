@@ -57,7 +57,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
+      <BrowserRouter basename="/MyCustomToDo">
         <Suspense
           fallback={
             <main className="h-full w-full flex justify-center items-center ">

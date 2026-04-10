@@ -31,6 +31,8 @@ interface ChildItemProps {
     allItems: ToDoItem[];
 }
 
+import { motion, AnimatePresence } from "framer-motion";
+
 /**
  * Renderiza una subtarea.
  * Se encarga de manejar la indentación visual basada en el nivel de prioridad y hereda el estado de completado del padre.
@@ -75,7 +77,13 @@ const ChildItem = ({
     }
 
     return (
-        <>
+        <motion.div
+            layout
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+        >
             <ListItem
                 disablePadding
                 sx={{
@@ -85,7 +93,6 @@ const ChildItem = ({
                     borderRadius: 2,
                     border: '1px solid',
                     borderColor: 'divider',
-                    transition: 'transform 1000ms ease',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                     '&:hover': {
                         borderColor: 'primary.light',
@@ -104,10 +111,7 @@ const ChildItem = ({
                         <IconButton
                             edge="end"
                             aria-label="add-child"
-                            onClick={() => {
-                                onAddChildBtn(childItem.itemId);
-                                if (!deployChildren.has(childItem.itemId)) onDeployChildren(childItem.itemId);
-                            }}
+                            onClick={() =>  onAddChildBtn(childItem.itemId)}
                             sx={{ mr: 1, color: 'text.disabled', '&:hover': { color: 'info.main' } }}
                         >
                             <LibraryAdd />
@@ -168,45 +172,60 @@ const ChildItem = ({
                 </ListItemButton>
             </ListItem>
 
-            {showChildForm && (
-                <CreateChildForm
-                    listId={listId}
-                    parentId={childItem.itemId}
-                    parentPriority={childItem.itemPriorityLevel}
-                    onClose={onCloseChildForm}
-                />
-            )}
+            <AnimatePresence>
+                {showChildForm && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                    >
+                        <CreateChildForm
+                            listId={listId}
+                            parentId={childItem.itemId}
+                            parentPriority={childItem.itemPriorityLevel}
+                            onClose={onCloseChildForm}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Renderizado de hijos */}
-            {deployChildren.has(childItem.itemId) && (
-                <div className="flex flex-col gap-1.5 mt-1.5">
-                    {allItems.filter(cf => cf.itemParent === childItem.itemId).map((cf) => {
-                        const absoluteIndex = allItems.findIndex(i => i.itemId === cf.itemId);
-                        return (
-                            <ChildItem
-                                key={cf.itemId}
-                                parentItem={childItem}
-                                childItem={cf}
-                                parentIndex={absoluteIndex}
-                                parentIsCompleted={isCompleted}
-                                listId={listId}
-                                onToggle={onToggle}
-                                onRemove={onRemove}
-                                onReOrder={onReOrder}
-                                onAddChildBtn={onAddChildBtn}
-                                //onOpenDrawer={onOpenDrawer}
-                                createChild={createChild}
-                                showChildForm={createChild === cf.itemId}
-                                onCloseChildForm={onCloseChildForm}
-                                onDeployChildren={onDeployChildren}
-                                deployChildren={deployChildren}
-                                allItems={allItems}
-                            />
-                        )
-                    })}
-                </div>
-            )}
-        </>
+            <AnimatePresence>
+                {deployChildren.has(childItem.itemId) && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="flex flex-col gap-1.5 mt-1.5"
+                    >
+                        {allItems.filter(cf => cf.itemParent === childItem.itemId).map((cf) => {
+                            const absoluteIndex = allItems.findIndex(i => i.itemId === cf.itemId);
+                            return (
+                                <ChildItem
+                                    key={cf.itemId}
+                                    parentItem={childItem}
+                                    childItem={cf}
+                                    parentIndex={absoluteIndex}
+                                    parentIsCompleted={isCompleted}
+                                    listId={listId}
+                                    onToggle={onToggle}
+                                    onRemove={onRemove}
+                                    onReOrder={onReOrder}
+                                    onAddChildBtn={onAddChildBtn}
+                                    //onOpenDrawer={onOpenDrawer}
+                                    createChild={createChild}
+                                    showChildForm={createChild === cf.itemId}
+                                    onCloseChildForm={onCloseChildForm}
+                                    onDeployChildren={onDeployChildren}
+                                    deployChildren={deployChildren}
+                                    allItems={allItems}
+                                />
+                            )
+                        })}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
     return null;
 };
