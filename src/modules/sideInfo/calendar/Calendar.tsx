@@ -6,7 +6,7 @@ import { Badge, Box, Typography, Button, Stack } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import useToDoStore from '../../../store/todoStore/ToDoStore';
 import { useShallow } from 'zustand/shallow';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
@@ -22,15 +22,9 @@ const Calendar = ({ itemId }: { itemId: string }) => {
 
     // Estado local para la fecha seleccionada en el calendario (sin guardar aún)
     const [tempDate, setTempDate] = useState<Dayjs | null>(
-        thisItem?.itemDeadline ? dayjs(thisItem.itemDeadline) : null
+        () => thisItem?.itemDeadline ? dayjs(thisItem.itemDeadline) : null
     );
 
-    // Sincronizar el estado local cuando cambia el ítem seleccionado
-    useEffect(() => {
-        if (thisItem) {
-            setTempDate(thisItem.itemDeadline ? dayjs(thisItem.itemDeadline) : null);
-        }
-    }, [itemId, thisItem?.itemDeadline]);
 
     const handleSaveDate = () => {
         if (itemId && tempDate) {
