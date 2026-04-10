@@ -6,9 +6,9 @@
     <title>Redirecting...</title>
     <script>
         // Redirigir todas las 404 a index.html para que React Router maneje las rutas
-        const path = window.location.pathname;
-        const redirect = window.location.origin + '/index.html?redirect=' + encodeURIComponent(path);
-        window.location.replace(redirect);
+        const path = globalThis.location.pathname;
+        const redirect = globalThis.location.origin + '/index.html?redirect=' + encodeURIComponent(path);
+        globalThis.location.replace(redirect);
     </script>
 </head>
 <body>
